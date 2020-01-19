@@ -18,7 +18,7 @@ start_container() {
 
     mkdir -p "$CACHE_DIR"
     # Use value of ENV variable or {} as empty settings
-    echo "${CUSTOM_ENV_AUTHFILE:-{\}}" > "$CACHE_DIR"/_authfile_"$CONTAINER_ID"
+    echo "${CUSTOM_ENV_DOCKER_AUTH_CONFIG:-{\}}" > "$CACHE_DIR"/_authfile_"$CONTAINER_ID"
     podman pull --authfile="$CACHE_DIR"/_authfile_"$CONTAINER_ID" "$IMAGE"
     rm "$CACHE_DIR"/_authfile_"$CONTAINER_ID"
     podman run \

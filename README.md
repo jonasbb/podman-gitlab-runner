@@ -63,6 +63,10 @@ Currently, the scripts do not provide much customization.
 However, you can adapt the functions `start_container` and `install_dependencies` to specify how Podman should spawn the containers and how to install the dependencies.
 For example, you can mount additional volumes when starting the containers.
 
+Podman supports accessing Gitlab private registries.
+You can set the `DOCKER_AUTH_CONFIG` variable under **Settings → CI / CD** and provide the credentials for accessing the private registry.
+Details how the variable has to look can be found under [using statically defined credentials][gitlab-static-credentials] in the Gitlab documentation.
+
 ## License
 
 Licensed under the [MIT license].
