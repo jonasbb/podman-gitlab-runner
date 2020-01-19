@@ -61,9 +61,14 @@ sudo -u gitlab-runner gitlab-runner register \
 
 Currently, the scripts do not provide much customization.
 However, you can adapt the functions `start_container` and `install_dependencies` to specify how Podman should spawn the containers and how to install the dependencies.
-For example, you can mount additional volumes when starting the containers.
 
-Podman supports accessing Gitlab private registries.
+Some behaviour can be tweaked by tweaked by setting the correct environment variables.
+Rename the `custom_base.template.sh` file into `custom_base.sh` to make use of the customization.
+The following variables are supported right now:
+
+* `PODMAN_RUN_ARGS`: Customize how Podman spawns the containers.
+
+Podman supports access to private Gitlab registries.
 You can set the `DOCKER_AUTH_CONFIG` variable under **Settings → CI / CD** and provide the credentials for accessing the private registry.
 Details how the variable has to look can be found under [using statically defined credentials][gitlab-static-credentials] in the Gitlab documentation.
 

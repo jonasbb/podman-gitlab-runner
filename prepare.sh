@@ -27,8 +27,7 @@ start_container() {
         --tty \
         --name "$CONTAINER_ID" \
         --volume "$CACHE_DIR:/home/user/cache" \
-        --volume "/sccache:/sccache:z" \
-        --cpus=1 \
+        "${PODMAN_RUN_ARGS[@]}" \
         "$IMAGE"
 }
 
