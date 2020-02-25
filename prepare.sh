@@ -26,7 +26,7 @@ start_container() {
         --interactive \
         --tty \
         --name "$CONTAINER_ID" \
-        --volume "$CACHE_DIR:/home/user/cache" \
+        --volume "$CACHE_DIR:/home/user/cache":Z \
         "${PODMAN_RUN_ARGS[@]}" \
         "$IMAGE"
 }
