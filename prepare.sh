@@ -28,7 +28,8 @@ start_container() {
         --name "$CONTAINER_ID" \
         --volume "$CACHE_DIR:/home/user/cache":Z \
         "${PODMAN_RUN_ARGS[@]}" \
-        "$IMAGE"
+        "$IMAGE"\
+        sleep 999999999
 }
 
 install_dependencies() {
