@@ -34,9 +34,7 @@ start_container() {
 
 install_dependencies() {
     # Install gitlab-runner binary since we need for cache/artifacts.
-    # curl -L --output gitlab-runner-"$CONTAINER_ID" https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
-    wget --show-progress --timestamping https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
-    cp gitlab-runner-linux-amd64 gitlab-runner-"$CONTAINER_ID"
+    curl -L --output gitlab-runner-"$CONTAINER_ID" https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
     chmod +x gitlab-runner-"$CONTAINER_ID"
     podman cp --pause=false gitlab-runner-"$CONTAINER_ID" "$CONTAINER_ID":/usr/bin/gitlab-runner
     rm gitlab-runner-"$CONTAINER_ID"
