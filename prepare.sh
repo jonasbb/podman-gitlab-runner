@@ -23,8 +23,6 @@ start_container() {
     rm "$CACHE_DIR"/_authfile_"$CONTAINER_ID"
     podman run \
         --detach \
-        --interactive \
-        --tty \
         --name "$CONTAINER_ID" \
         --volume "$CACHE_DIR:/home/user/cache":Z \
         "${PODMAN_RUN_ARGS[@]}" \
