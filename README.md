@@ -13,6 +13,12 @@ The install instructions are for a Fedora 31+ installation.
 Most of the instructions should transfer to other distributions.
 gitlab-runner needs to be installed in version 12.6 or higher, because we rely on the `image` tag being exposed from the `.gitlab-ci.yml` file.
 
+### Set up rootless Podman for the gitlab-runner user
+
+Make sure you have added entries in `/etc/subuid` and `/etc/subgid` for the gitlab-runner user.
+Enable lingering for the gitlab-runner user with `sudo loginctl enable-linger gitlab-runner`.
+Run `sudo -iu gitlab-runner podman system migrate` to set correct cgroups behavior and silence a warning during job execution.
+
 ### Installing the gitlab-runner
 
 First, you need to install the [gitlab-runner][gitlab-runner-install] using the instructions listed on the website.
@@ -24,15 +30,13 @@ sudo chcon -t bin_t /usr/bin/gitlab-runner
 
 Ensure that the gitlab-runner service runs with the appropirate permissions.
 Since we are using Podman in a rootless setup, we can run the service with user privileges instead of root permissions.
-Edit the service file (`/etc/systemd/system/gitlab-runner.service`) and add the `User` and `Group` lines in the service section.
+Add a systemd dropin (`/etc/systemd/system/gitlab-runner.service.d/rootless.conf`):
 
 ```ini
 [Service]
 User=gitlab-runner
 Group=gitlab-runner
 ```
-
-**Note:** This step has to be re-done on every update of the `gitlab-runner` package, since it overwrites the modifications to the service file. This is because the package places the service file into the wrong directory.
 
 ### Setting up a Runner Instance
 
@@ -52,9 +56,9 @@ sudo -u gitlab-runner gitlab-runner register \
     --executor custom \
     --builds-dir /home/user \
     --cache-dir /home/user/cache \
-    --custom-prepare-exec "/home/gitlab-runner/prepare.sh" \
-    --custom-run-exec "/home/gitlab-runner/run.sh" \
-    --custom-cleanup-exec "/home/gitlab-runner/cleanup.sh"
+    --custom-prepare-exec "/home/gitlab-runner/podman-gitlab-runner/prepare.sh" \
+    --custom-run-exec "/home/gitlab-runner/podman-gitlab-runner/run.sh" \
+    --custom-cleanup-exec "/home/gitlab-runner/podman-gitlab-runner/cleanup.sh"
 ```
 
 ## Tweaking the Installation
