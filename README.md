@@ -88,6 +88,8 @@ Licensed under the [MIT license].
     Official documentation about the custom executor feature for Gitlab CI.
 * <https://docs.gitlab.com/runner/executors/custom_examples/>  
     Official examples how to use the custom executor feature.
+* <https://gitlab.com/theodore.goetz/gitlab-executor-podman>
+    Alternative implementation of a Podman executor.
 
 [gitlab-runner-install]: https://docs.gitlab.com/runner/install/linux-repository.html
 [gitlab-runner-register]: https://docs.gitlab.com/runner/register/
