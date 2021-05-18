@@ -1,9 +1,11 @@
 # Using Podman to power your Gitlab CI pipeline
 
 1. [Installation and Setup](#installation-and-setup)
-    1. [Installing the gitlab-runner](#installing-the-gitlab-runner)
-    2. [Setting up a Runner Instance](#setting-up-a-runner-instance)
+    1. [Set up rootless Podman for the gitlab-runner user](#set-up-rootless-podman-for-the-gitlab-runner-user)
+    2. [Installing the gitlab-runner](#installing-the-gitlab-runner)
+    3. [Setting up a Runner Instance](#setting-up-a-runner-instance)
 2. [Tweaking the Installation](#tweaking-the-installation)
+    1. [Private Registries](#private-registries)
 3. [License](#license)
 4. [Links](#links)
 
@@ -72,9 +74,25 @@ The following variables are supported right now:
 
 * `PODMAN_RUN_ARGS`: Customize how Podman spawns the containers.
 
-Podman supports access to private Gitlab registries.
+### Private Registries
+
+Podman supports access to private registries.
 You can set the `DOCKER_AUTH_CONFIG` variable under **Settings → CI / CD** and provide the credentials for accessing the private registry.
 Details how the variable has to look can be found under [using statically defined credentials][gitlab-static-credentials] in the Gitlab documentation.
+
+Additionally, there are multiple ways to authenticate against Gitlab Registries.
+The script uses a configured deploy token (via `$CI_DEPLOY_PASSWORD`) to login.
+Alternatively, the CI job also provides access to the registry for the duraion of a single job.
+The scipt uses variables `$CI_JOB_TOKEN` and `$CI_REGISTRY_PASSWORD`, if available, to log into the registry.
+
+The four methods are tried in order until one succeeds:
+
+1. `DOCKER_AUTH_CONFIG`
+2. `CI_DEPLOY_PASSWORD`
+3. `CI_JOB_TOKEN`
+4. `CI_REGISTRY_PASSWORD`
+
+More details about different authentication variants in the official documentation: <https://docs.gitlab.com/ee/user/packages/container_registry/index.html#authenticate-by-using-gitlab-cicd>
 
 ## License
 
