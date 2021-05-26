@@ -4,7 +4,7 @@ currentDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # shellcheck source=base.sh
 source "${currentDir}"/base.sh
 
-set -eo pipefail
+set -eEo pipefail
 
 # trap any error, and mark it as a system failure.
 trap 'exit $SYSTEM_FAILURE_EXIT_CODE' ERR
