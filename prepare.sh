@@ -65,7 +65,11 @@ start_container() {
 
 install_dependencies() {
     # Copy gitlab-runner binary from the server into the container
-    podman cp --pause=false /usr/bin/gitlab-runner "$CONTAINER_ID":/usr/bin/gitlab-runner
+    if [ -x /usr/local/bin/gitlab-runner ]; then
+        podman cp --pause=false /usr/local/bin/gitlab-runner "$CONTAINER_ID":/usr/bin/gitlab-runner
+    else
+        podman cp --pause=false /usr/bin/gitlab-runner "$CONTAINER_ID":/usr/bin/gitlab-runner
+    fi
 
     # Install bash in systems with APK (e.g., Alpine)
     podman exec "$CONTAINER_ID" sh -c 'if ! type bash >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without bash"; apk add bash; fi'
