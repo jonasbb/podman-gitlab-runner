@@ -78,6 +78,13 @@ install_dependencies() {
     podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without git"; apk add git; fi'
     # Install git in systems with YUM (e.g., RHEL<=7)
     podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type yum >/dev/null 2>&1 ; then echo "YUM based distro without git"; yum install --assumeyes git; fi'
+
+    # Install git-lfs in systems with APT (e.g., Debian)
+    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type apt-get >/dev/null 2>&1 ; then echo "APT based distro without git-lfs"; apt-get update && apt-get install --no-install-recommends -y ca-certificates git-lfs; fi'
+    # Install git-lfs in systems with DNF (e.g., Fedora)
+    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type dnf >/dev/null 2>&1 ; then echo "DNF based distro without git-lfs"; dnf install --setopt=install_weak_deps=False --assumeyes git-lfs; fi'
+    # Install git-lfs in systems with APK (e.g., Alpine)
+    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without git-lfs"; apk add git-lfs; fi'
 }
 
 echo "Running in $CONTAINER_ID"
