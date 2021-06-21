@@ -63,6 +63,34 @@ start_container() {
         sleep 999999999
 }
 
+install_command() {
+    # Run test if this binary exists
+    PACKAGE=$1
+    TEST_BINARY=$PACKAGE
+
+    podman exec --user root:root "$CONTAINER_ID" /bin/bash -c 'if ! type '"$TEST_BINARY"' >/dev/null 2>&1; then
+        if type apt-get >/dev/null 2>&1; then
+            echo "APT based distro without '"$TEST_BINARY"'"
+            apt-get update && apt-get install --no-install-recommends --yes '"$PACKAGE"'
+        elif type dnf >/dev/null 2>&1; then
+            echo "DNF based distro without '"$TEST_BINARY"'"
+            dnf install --setopt=install_weak_deps=False --assumeyes '"$PACKAGE"'
+        elif type apk >/dev/null 2>&1; then
+            echo "APK based distro without '"$TEST_BINARY"'"
+            apk add '"$PACKAGE"'
+        elif type yum >/dev/null 2>&1; then
+            echo "YUM based distro without '"$TEST_BINARY"'"
+            yum install --assumeyes '"$PACKAGE"'
+        elif type pacman >/dev/null 2>&1; then
+            echo "PACMAN based distro without '"$TEST_BINARY"'"
+            pacman --sync --refresh --noconfirm '"$PACKAGE"'
+        elif type zypper >/dev/null 2>&1; then
+            echo "ZYPPER based distro without '"$TEST_BINARY"'"
+            zypper install --no-confirm --no-recommends '"$PACKAGE"'
+        fi
+    fi'
+}
+
 install_dependencies() {
     # Copy gitlab-runner binary from the server into the container
     if [ -x /usr/local/bin/gitlab-runner ]; then
@@ -72,23 +100,12 @@ install_dependencies() {
     fi
 
     # Install bash in systems with APK (e.g., Alpine)
-    podman exec "$CONTAINER_ID" sh -c 'if ! type bash >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without bash"; apk add bash; fi'
+    podman exec --user root:root "$CONTAINER_ID" sh -c 'if ! type bash >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without bash"; apk add bash; fi'
 
-    # Install git in systems with APT (e.g., Debian)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type apt-get >/dev/null 2>&1 ; then echo "APT based distro without git"; apt-get update && apt-get install --no-install-recommends -y ca-certificates git; fi'
-    # Install git in systems with DNF (e.g., Fedora)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type dnf >/dev/null 2>&1 ; then echo "DNF based distro without git"; dnf install --setopt=install_weak_deps=False --assumeyes git; fi'
-    # Install git in systems with APK (e.g., Alpine)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without git"; apk add git; fi'
-    # Install git in systems with YUM (e.g., RHEL<=7)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git >/dev/null 2>&1 && type yum >/dev/null 2>&1 ; then echo "YUM based distro without git"; yum install --assumeyes git; fi'
-
-    # Install git-lfs in systems with APT (e.g., Debian)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type apt-get >/dev/null 2>&1 ; then echo "APT based distro without git-lfs"; apt-get update && apt-get install --no-install-recommends -y ca-certificates git-lfs; fi'
-    # Install git-lfs in systems with DNF (e.g., Fedora)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type dnf >/dev/null 2>&1 ; then echo "DNF based distro without git-lfs"; dnf install --setopt=install_weak_deps=False --assumeyes git-lfs; fi'
-    # Install git-lfs in systems with APK (e.g., Alpine)
-    podman exec "$CONTAINER_ID" /bin/bash -c 'if ! type git-lfs >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without git-lfs"; apk add git-lfs; fi'
+    install_command ca-certificates
+    install_command git
+    # Not available on all systems, e.g., Debian 9 or RHEL 7
+    install_command git-lfs || true
 }
 
 echo "Running in $CONTAINER_ID"
