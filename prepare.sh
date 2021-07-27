@@ -112,3 +112,6 @@ echo "Running in $CONTAINER_ID"
 
 start_container
 install_dependencies
+
+# Create build folder such that unprivileged users have access
+podman exec --user root:root "$CONTAINER_ID" /bin/bash -c "mkdir -p '$CUSTOM_ENV_CI_BUILDS_DIR' && chmod -R 777 '$CUSTOM_ENV_CI_BUILDS_DIR'"
