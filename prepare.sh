@@ -22,34 +22,37 @@ start_container() {
 
     # Try logging into the Gitlab Registry if credentials are provided
     # https://docs.gitlab.com/ee/user/packages/container_registry/index.html#authenticate-by-using-gitlab-cicd
-    if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
-        [[ -n "$CUSTOM_ENV_CI_DEPLOY_USER" && -n "$CUSTOM_ENV_CI_DEPLOY_PASSWORD" ]]
+    if [[ -n "$CUSTOM_ENV_CI_REGISTRY" ]]
     then
-        echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_DEPLOY_USER"
-        podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
-            --username "$CUSTOM_ENV_CI_DEPLOY_USER" \
-            --password "$CUSTOM_ENV_CI_DEPLOY_PASSWORD" \
-            "$CUSTOM_ENV_CI_REGISTRY"
-    fi
+        if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
+            [[ -n "$CUSTOM_ENV_CI_DEPLOY_USER" && -n "$CUSTOM_ENV_CI_DEPLOY_PASSWORD" ]]
+        then
+            echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_DEPLOY_USER"
+            podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
+                --username "$CUSTOM_ENV_CI_DEPLOY_USER" \
+                --password "$CUSTOM_ENV_CI_DEPLOY_PASSWORD" \
+                "$CUSTOM_ENV_CI_REGISTRY"
+        fi
 
-    if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
-        [[ -n "$CUSTOM_ENV_CI_JOB_USER" && -n "$CUSTOM_ENV_CI_JOB_TOKEN" ]]
-    then
-        echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_JOB_USER"
-        podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
-            --username "$CUSTOM_ENV_CI_JOB_USER" \
-            --password "$CUSTOM_ENV_CI_JOB_TOKEN" \
-            "$CUSTOM_ENV_CI_REGISTRY"
-    fi
+        if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
+            [[ -n "$CUSTOM_ENV_CI_JOB_USER" && -n "$CUSTOM_ENV_CI_JOB_TOKEN" ]]
+        then
+            echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_JOB_USER"
+            podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
+                --username "$CUSTOM_ENV_CI_JOB_USER" \
+                --password "$CUSTOM_ENV_CI_JOB_TOKEN" \
+                "$CUSTOM_ENV_CI_REGISTRY"
+        fi
 
-    if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
-        [[ -n "$CUSTOM_ENV_CI_REGISTRY_USER" && -n "$CUSTOM_ENV_CI_REGISTRY_PASSWORD" ]]
-    then
-        echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_REGISTRY_USER"
-        podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
-            --username "$CUSTOM_ENV_CI_REGISTRY_USER" \
-            --password "$CUSTOM_ENV_CI_REGISTRY_PASSWORD" \
-            "$CUSTOM_ENV_CI_REGISTRY"
+        if ! podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" --get-login "$CUSTOM_ENV_CI_REGISTRY" 2>/dev/null && \
+            [[ -n "$CUSTOM_ENV_CI_REGISTRY_USER" && -n "$CUSTOM_ENV_CI_REGISTRY_PASSWORD" ]]
+        then
+            echo "Login to ${CUSTOM_ENV_CI_REGISTRY} with CI_REGISTRY_USER"
+            podman login --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" \
+                --username "$CUSTOM_ENV_CI_REGISTRY_USER" \
+                --password "$CUSTOM_ENV_CI_REGISTRY_PASSWORD" \
+                "$CUSTOM_ENV_CI_REGISTRY"
+        fi
     fi
 
     podman pull --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" "$IMAGE"
