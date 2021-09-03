@@ -96,10 +96,72 @@ install_command() {
 
 install_dependencies() {
     # Copy gitlab-runner binary from the server into the container
-    if [ -x /usr/local/bin/gitlab-runner ]; then
-        podman cp --pause=false /usr/local/bin/gitlab-runner "$CONTAINER_ID":/usr/bin/gitlab-runner
-    else
-        podman cp --pause=false /usr/bin/gitlab-runner "$CONTAINER_ID":/usr/bin/gitlab-runner
+    local RUNNER_BINARY
+    local RUNNER_BINARY_PREFIX
+    local RUNNER_BINARY_TMP
+
+    # First check some predefined paths
+    for RUNNER_BINARY_PREFIX in /usr{/local,}/bin
+    do
+      RUNNER_BINARY="${RUNNER_BINARY_PREFIX}/gitlab-runner"
+      if [ -x "${RUNNER_BINARY}" ]
+      then
+        break
+      fi
+    done
+
+    # If unsuccessful, check shell PATHs
+    if [ ! -x "${RUNNER_BINARY}" ]
+    then
+      RUNNER_BINARY="$(type -p gitlab-runner || true)"
+    fi
+
+    # As a last resort, download binary...
+    if [ ! -x "${RUNNER_BINARY}" ]
+    then
+      # ... to temporary directory
+      RUNNER_BINARY_TMP="$(mktemp --directory --tmpdir="${CACHE_DIR}")"
+      RUNNER_BINARY="${RUNNER_BINARY_TMP}/gitlab-runner"
+
+      # Find local architecture to download correct binary
+      # https://stackoverflow.com/questions/45125516/possible-values-for-uname-m/45125525#45125525
+      local RUNNER_BINARY_ARCH
+      local RUNNER_BINARY_URL
+      case "$(uname -m)" in
+        x86_64)
+          RUNNER_BINARY_ARCH=amd64
+          ;;
+        arm)
+          RUNNER_BINARY_ARCH=arm
+          ;;
+        i[36]86)
+          RUNNER_BINARY_ARCH=386
+          ;;
+        aarch64|armv8l)
+          RUNNER_BINARY_ARCH=arm64
+          ;;
+        s390*)
+          RUNNER_BINARY_ARCH=s390x
+          ;;
+        ppc64le)
+          RUNNER_BINARY_ARCH=ppc64le
+          ;;
+      esac
+      # https://docs.gitlab.com/runner/install/linux-manually.html#install-1
+      RUNNER_BINARY_URL="https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-${RUNNER_BINARY_ARCH}"
+
+      # Errors during download should kill the script...
+      curl --location --output "${RUNNER_BINARY}" "${RUNNER_BINARY_URL}"
+      # ... otherwise, we now have a working gitlab-runner binary
+      chmod +x "${RUNNER_BINARY}"
+    fi
+
+    podman cp --pause=false "${RUNNER_BINARY}" "$CONTAINER_ID":/usr/bin/gitlab-runner
+
+    # Clean up if download directory was used
+    if [ -d "${RUNNER_BINARY_TMP}" ]
+    then
+      rm -rf "${RUNNER_BINARY_TMP}"
     fi
 
     # Install bash in systems with APK (e.g., Alpine)
