@@ -60,7 +60,7 @@ start_container() {
     podman run \
         --detach \
         --name "$CONTAINER_ID" \
-        --volume "$CACHE_DIR:/home/user/cache":Z \
+        --volume "$CACHE_DIR:/home/user/cache":z \
         "${PODMAN_RUN_ARGS[@]}" \
         "$IMAGE"\
         sleep 999999999
