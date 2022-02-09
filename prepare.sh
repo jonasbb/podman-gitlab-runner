@@ -63,7 +63,7 @@ start_container() {
         --volume "$CACHE_DIR:/home/user/cache":z \
         "${PODMAN_RUN_ARGS[@]}" \
         "$IMAGE"\
-        sleep 999999999
+        "${PODMAN_RUN_COMMAND:-sleep 999999999}"
 }
 
 install_command() {
