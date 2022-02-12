@@ -57,13 +57,15 @@ start_container() {
 
     podman pull --authfile "$CACHE_DIR"/_authfile_"$CONTAINER_ID" "$IMAGE"
     rm "$CACHE_DIR"/_authfile_"$CONTAINER_ID"
+    # We want shell splitting on PODMAN_RUN_COMMAND
+    # shellcheck disable=2086
     podman run \
         --detach \
         --name "$CONTAINER_ID" \
         --volume "$CACHE_DIR:/home/user/cache":z \
         "${PODMAN_RUN_ARGS[@]}" \
         "$IMAGE"\
-        "${PODMAN_RUN_COMMAND:-sleep 999999999}"
+        ${PODMAN_RUN_COMMAND:-sleep 999999999}
 }
 
 install_command() {
