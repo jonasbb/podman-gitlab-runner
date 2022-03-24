@@ -94,6 +94,14 @@ The four methods are tried in order until one succeeds:
 
 More details about different authentication variants in the official documentation: <https://docs.gitlab.com/ee/user/packages/container_registry/index.html#authenticate-by-using-gitlab-cicd>
 
+## Using Podman in Podman containers
+
+Executing Podman inside is useful to test containers or build new images inside the CI.
+By default the nesting fails, since access to the overlayfs is not possible.
+
+RedHat has a guide how to run Podman inside of Podman containers in both rootful and rootless scenarios:
+<https://www.redhat.com/sysadmin/podman-inside-container>
+
 ## License
 
 Licensed under the [MIT license].
