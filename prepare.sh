@@ -169,6 +169,7 @@ install_dependencies() {
     # Install bash in systems with APK (e.g., Alpine)
     podman exec --user root:root "$CONTAINER_ID" sh -c 'if ! type bash >/dev/null 2>&1 && type apk >/dev/null 2>&1 ; then echo "APK based distro without bash"; apk add bash; fi'
 
+    install_command hostname
     install_command ca-certificates
     install_command git
     # Not available on all systems, e.g., Debian 9 or RHEL 7
