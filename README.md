@@ -1,6 +1,6 @@
 # Using Podman to power your Gitlab CI pipeline
 
-**⚠️ NOTE ⚠️**: New deployments should avoid using code from this repository. Instead the official Podman support should be used <https://docs.gitlab.com/runner/executors/docker.html#use-podman-to-run-docker-commands-beta>.
+**⚠️ NOTE ⚠️**: New deployments should avoid using code from this repository. Instead the official Podman support should be used <https://docs.gitlab.com/runner/executors/docker.html#use-podman-to-run-docker-commands>.
 Old deployments should consider migrating if possible.
 
 1. [Installation and Setup](#installation-and-setup)
